@@ -1,3 +1,0 @@
-[submodule ".devcontainer"]
-	path = .devcontainer
-	url = https://github.com/Johnyb0223/avr-dev-env.git

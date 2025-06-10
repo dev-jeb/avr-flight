@@ -1,0 +1,17 @@
+[package]
+name = "avr-flight"
+version = "0.1.0"
+authors = ["dev_jeb <developer_jeb@outlook.com>"]
+edition = "2024"
+
+[profile.release]
+panic = "abort"
+
+[dependencies]
+ufmt = "0.2.0"
+embedded-hal = "1.0"
+
+[dependencies.arduino-hal]
+git = "https://github.com/rahix/avr-hal"
+rev = "fafaf587a32a4500239fd073f89d1b9c36b48092"
+features = ["arduino-uno"]
