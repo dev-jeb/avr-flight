@@ -1,3 +1,4 @@
 /target
 /simavr
 **/.DS_Store
+**/*.o

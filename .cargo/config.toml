@@ -1,11 +1,31 @@
 [build]
-target = "avr-none"
-rustflags = ["-C", "target-cpu=atmega328p"]
 
-[target.'cfg(target_arch = "avr")']
-# runner = "ravedude"
-# To run in simulator, replace the line above with this:
-runner = " ./simavr/simavr/run_avr -m atmega328p"
+target = "avr-none"
+
+rustflags = [
+    "-C", "target-cpu=atmega328p",
+
+    # This tells the linker (avr-ld) to use our custom linker script. This linker script is specific to the
+    # atmega328p. It specifies the memory layout of the microcontroller and tells the linker where certain sections
+    # of code should be placed. By placed this really means the linker gives sections certain attributes that tell
+    # the operation system or in our case avrdude where to write thie sections in memory.
+    "-C", "link-arg=-Tcommon/default.ld",
+
+    "-C", "link-arg=-mmcu=atmega328p",
+
+    # This tells the linker to not use the standard startup files. If we didn't specify this
+    # the linker would attempt to the the crtatmega328p.o from the standard library. This is the standard
+    # atmega328p runtime that is in charge of putting the microcontroller into a known state before we invoke
+    # the main function.
+    "-C", "link-arg=-nostartfiles",
+
+    # This tells the linker to use the common directory to search for .
+    "-C", "link-arg=-Lcommon"
+]
+
+[target.avr-none]
+#runner = "ravedude"
+runner = "./run_avr.elf -m atmega328p -g 1234 ./target/avr-none/debug/avr-flight.elf"
 
 [unstable]
 build-std = ["core"]

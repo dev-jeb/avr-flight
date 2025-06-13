@@ -1,39 +1,29 @@
 #![no_std]
 #![no_main]
 
-use core::panic::PanicInfo;
-use embedded_hal::delay::DelayNs;
-use embedded_hal::digital::StatefulOutputPin;
+mod port;
 
-#[inline(never)]
 #[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
+fn panic(_panic: &core::panic::PanicInfo) -> ! {
     loop {}
 }
 
-fn blink(led: &mut impl StatefulOutputPin, delay: &mut impl DelayNs) -> ! {
-    loop {
-        led.toggle().unwrap();
-        delay.delay_ms(100);
-        led.toggle().unwrap();
-        delay.delay_ms(100);
-        led.toggle().unwrap();
-        delay.delay_ms(100);
-        led.toggle().unwrap();
-        delay.delay_ms(800);
+/// Simple busy-wait delay function
+/// This is a very basic delay that wastes CPU cycles
+fn delay(cycles: u32) {
+    let mut i = 0;
+    while i < cycles {
+        i += 1;
     }
 }
 
-#[arduino_hal::entry]
-fn main() -> ! {
-    let dp = arduino_hal::Peripherals::take().unwrap();
-    let pins = arduino_hal::pins!(dp);
-
-    // Digital pin 13 is also connected to an onboard LED marked "L"
-    let mut led = pins.d13.into_output();
-    led.set_high();
-
-    let mut delay = arduino_hal::Delay::new();
-
-    blink(&mut led, &mut delay);
+#[unsafe(no_mangle)]
+pub extern "C" fn main() -> ! {
+    let mut port = port::portb::init();
+    port.set_pin_mode(5, true);
+    port.set_pin_state(5, true);
+    loop {
+        port.set_pin_state(5, !port.read_pin(5));
+        delay(100000);
+    }
 }
