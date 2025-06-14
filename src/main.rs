@@ -1,18 +1,12 @@
 #![no_std]
 #![no_main]
 
-mod port;
+use avr_flight::delay;
+use avr_flight::port;
 
 #[panic_handler]
-fn panic(_panic: &core::panic::PanicInfo) -> ! {
+pub fn panic(_panic: &core::panic::PanicInfo) -> ! {
     loop {}
-}
-
-fn delay(cycles: u32) {
-    let mut i = 0;
-    while i < cycles {
-        i += 1;
-    }
 }
 
 #[unsafe(no_mangle)]
@@ -22,6 +16,6 @@ pub extern "C" fn main() -> ! {
     port.set_pin_state(5, true);
     loop {
         port.set_pin_state(5, !port.read_pin(5));
-        delay(100000);
+        delay::delay(100000);
     }
 }
